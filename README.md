@@ -3,11 +3,11 @@
 Może szybciej było przeglądać jedno ogłoszenie po drugim a nie pisać od razu apkę...? Nigdy się nie dowiemy :P
 
 #### Informacje z ogłoszenia:
-- cenę mieszkania
+- cena mieszkania
 - dzielnica
 - wielkość mieszkania
 - które piętro
-- czu mamy rzut mieszkania
+- czy mamy rzut mieszkania
 - ile pokoi
 - zdjęcia
 
@@ -17,8 +17,25 @@ Może szybciej było przeglądać jedno ogłoszenie po drugim a nie pisać od ra
 - czy jest balkon
 - rok budowy
 - cechy okolicy
+- komórka / piwnica?
 
 #### Wyliczyć sobie później:
 - odległość do stacji metra
 - odległość od parku
 - jaki dojazd do mojej siłowni (!!!)
+
+
+> LOCATION, LOCATION, LOCATION
+
+
+# Plan 
+1. Zebrać dane ze wszystkich ogłoszeń (+zdjęcia)
+2. Wyczyścić dane 
+3. Przechowywać dane w jakiś sensowny sposób
+4. Strona we Flasku do przeglądania wybranych ofert - wg moich kryteriów + wszysktie zdjęcia na raz
+5. Analiza wykrycie anomiali?
+    - średnia cena za metr w dzielnicy
+   
+
+
+? dodać info, że ogłoszenie zostało zdjęte z datą?

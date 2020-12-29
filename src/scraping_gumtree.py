@@ -1,11 +1,10 @@
-import pandas
 import requests
 from bs4 import BeautifulSoup
 import json
 import re
 
-# mieszkania gumtree Wawa na sprzedaż
-# https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/warszawa/mieszkanie/v1c9073l3200008a1dwp1
+
+
 
 # przykładowy adres ogłoszenia:
 # ad_link = "https://www.gumtree.pl/a-mieszkania-i-domy-sprzedam-i-kupie/bielany/4-pokojowe-mieszkanie-bielany-ul-kochanowskiego/1008615130830911378860309"
@@ -48,3 +47,5 @@ for elem in attributes2:
 
 #### ID ogłoszenia
 print(ad_link.split('/')[-1])
+
+# class Mieszkanie:
