@@ -4,22 +4,38 @@ import json
 import re
 
 
-def get_description(soup):
+# TODO what if everything si empty
+
+
+def get_price(soup) -> str:
+    results = soup.find(id="wrapper")
+    price = results.find('span', class_='amount')
+
+    return re.sub("[^\d\.,]", "", price.text)
+
+
+def get_description(soup) -> dict:
     results = soup.find(id="wrapper")
     description = results.find('div', class_='description')
 
-    return description.text
+    return {"description": description.text}
 
 
-def get_photos(soup):
+def get_photos(soup) -> dict:
     gallery = soup.find(id="vip-gallery-data")
     pattern = re.compile('\{.*\}')
     json_obj = json.loads(re.findall(pattern, str(gallery))[0])
 
-    return dict(zip(json_obj['alt-tags'], json_obj['large']))
+    return {"photos_links": dict(zip(json_obj['alt-tags'], json_obj['large']))}
 
 
-def get_attributes(soup):
+def extract_num(text: str) -> int:
+    if "Kawalerka" in text:
+        return 1
+    return re.sub("[^\d]", "", text)
+
+
+def get_attributes(soup) -> dict:
     results = soup.find(id="wrapper")
     attributes = results.find('ul', class_='selMenu')
     attributes2 = attributes.find_all('div', class_='attribute')
@@ -32,22 +48,67 @@ def get_attributes(soup):
         attr_val = (elem.find('span', class_='value')).text
 
         if attr_name not in attr_dict:
+            if attr_name in ['Liczba pokoi', 'Liczba łazienek']:
+                attr_val = extract_num(attr_val)
+                print(attr_name, attr_val)
             attr_dict[attr_name] = attr_val
 
     return attr_dict
 
 
-def get_flat_info(link):
+keys_dict = {
+    'Data dodania': 'date_added',
+    'Lokalizacja': 'location',
+    'Na sprzedaż przez': 'seller',
+    'Rodzaj nieruchomości': 'property_type',
+    'Liczba pokoi': 'num_rooms',
+    'Liczba łazienek': 'num_bathrooms',
+    'Wielkość (m2)': 'flat_area',
+    'Parking': 'parking'}
+
+
+class Flat:
+    def __init__(self, ad_id, price, **kwargs):
+        self.ad_id = ad_id
+        self.price = price
+
+        self.description = ''
+        self.date_added = ''
+        self.seller = ''
+        self.property_type = ''
+        self.num_rooms = ''
+        self.num_bathrooms = ''
+        self.flat_area = 0
+        self.parking = ''
+
+        for key, value in kwargs.items():
+            if key in keys_dict:
+                key = keys_dict[key]
+            setattr(self, key, value)
+
+    def show_attr(self):
+        print(vars(self))
+
+
+def get_flat_info(link) -> list:
+    link = f'https://www.gumtree.pl{link}'
+
     page = requests.get(link)
     soup = BeautifulSoup(page.content, 'html.parser')
+
+    ad_id = link.split('/')[-1]
+    price = get_price(soup)
 
     description = get_description(soup)
     photos_links = get_photos(soup)
     attributes = get_attributes(soup)
-    id = link.split('/')[-1]
 
-    return [id, attributes, description, photos_links]
+    ad_attributes = attributes | description | photos_links
+
+    return Flat(ad_id, price, **ad_attributes)
 
 
-ad_link = 'https://www.gumtree.pl/a-mieszkania-i-domy-sprzedam-i-kupie/srodmiescie/mieszkanie-2-pokojowe-piekna-okolica/1006938050400911260981009'
-print(get_flat_info(ad_link))
+if __name__ == "__main__":
+    ad_link = '/a-mieszkania-i-domy-sprzedam-i-kupie/zoliborz/mieszkanie-warszawa-zoliborz-55m2-nr-sol+ms+137199+2/1008618526330911559470109'
+    flat = get_flat_info(ad_link)
+    flat.show_attr()

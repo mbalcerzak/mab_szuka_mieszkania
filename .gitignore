@@ -4,3 +4,5 @@ data/
 
 *.jl
 playground.py
+
+__pycache__/
