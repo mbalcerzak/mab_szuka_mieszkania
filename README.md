@@ -23,6 +23,7 @@ Może szybciej było przeglądać jedno ogłoszenie po drugim a nie pisać od ra
 - odległość do stacji metra
 - odległość od parku
 - jaki dojazd do mojej siłowni (!!!)
+- cena za metr
 
 
 > LOCATION, LOCATION, LOCATION
@@ -39,3 +40,6 @@ Może szybciej było przeglądać jedno ogłoszenie po drugim a nie pisać od ra
 
 
 ? dodać info, że ogłoszenie zostało zdjęte z datą?
+
+? Gumtree, OtoDom, Olx ? Tylko te strony?
+
