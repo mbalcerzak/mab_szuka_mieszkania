@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import re
+import sqlite3
 
 
 def get_price(soup) -> str:
@@ -23,7 +24,14 @@ def get_photos(soup) -> dict:
     pattern = re.compile('\{.*\}')
     json_obj = json.loads(re.findall(pattern, str(gallery))[0])
 
-    return {"photos_links": dict(zip(json_obj['alt-tags'], json_obj['large']))}
+    return {"photos_links": json_obj['large']}
+
+
+def get_add_title(soup) -> str:
+    results = soup.find('div', class_="vip-title clearfix")
+    title = results.find('span', class_='myAdTitle')
+
+    return title.text
 
 
 def extract_num(text: str) -> int:
@@ -64,9 +72,10 @@ keys_dict = {
 
 
 class Flat:
-    def __init__(self, ad_id, price, **kwargs):
+    def __init__(self, ad_id, price, title, **kwargs):
         self.ad_id = ad_id
         self.price = price
+        self.title = title
 
         self.description = 'NA'
         self.date_added = 'NA'
@@ -75,7 +84,7 @@ class Flat:
         self.num_rooms = 0
         self.num_bathrooms = 1
         self.flat_area = 0
-        self.parking = 'NA'
+        self.parking = 'Brak'
 
         for key, value in kwargs.items():
             if key in keys_dict:
@@ -94,6 +103,7 @@ def get_flat_info(link) -> list:
 
     ad_id = link.split('/')[-1][3:12]
     price = get_price(soup)
+    title = get_add_title(soup)
 
     description = get_description(soup)
     photos_links = get_photos(soup)
@@ -101,10 +111,46 @@ def get_flat_info(link) -> list:
 
     ad_attributes = attributes | description | photos_links
 
-    return Flat(ad_id, price, **ad_attributes)
+    return Flat(ad_id, price, title, **ad_attributes)
+
+
+def add_flat(flat):
+    try:
+        conn = sqlite3.connect('../data/flats.db')
+        cursor = conn.cursor()
+        print("Connected to SQLite")
+    except sqlite3.Error as e:
+        raise Exception
+
+    input_ = (f"INSERT INTO flats VALUES ("
+                   f"{flat.ad_id}, "
+                   f"'{flat.title}', "
+                   f"'{flat.date_added}', "
+                   f"'{flat.location}', "
+                   f"{flat.price}, "
+                   f"'{flat.seller}', "
+                   f"'{flat.property_type}', "
+                   f"{flat.num_rooms}, "
+                   f"{flat.num_bathrooms}, "
+                   f"{flat.flat_area}, "
+                   f"'{flat.parking}', "
+                   f"\"{flat.description}\", "
+                   f"\"{flat.photos_links}\""
+                   ")")
+
+    try:
+        cursor.execute(input_)
+        conn.commit()
+    except sqlite3.Error as e:
+        print(e)
+
+    # cursor.execute('SELECT * FROM flats')
+    # print(cursor.fetchone())
+
+    conn.close()
 
 
 if __name__ == "__main__":
     ad_link = '/a-mieszkania-i-domy-sprzedam-i-kupie/zoliborz/mieszkanie-warszawa-zoliborz-55m2-nr-sol+ms+137199+2/1008618526330911559470109'
-    flat = get_flat_info(ad_link)
-    flat.show_attr()
+    flat1 = get_flat_info(ad_link)
+    flat1.show_attr()

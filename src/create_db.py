@@ -29,6 +29,7 @@ def main():
 
     sql_create_flats_table = """CREATE TABLE IF NOT EXISTS flats(
                                     ad_id integer PRIMARY KEY,
+                                    title text NOT NULL,
                                     date_added text NOT NULL,
                                     location text NOT NULL,
                                     price integer,
