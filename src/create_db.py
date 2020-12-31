@@ -27,15 +27,15 @@ def db_path():
 def main():
     database = db_path()
 
-    sql_create_flats_table = """CREATE TABLE IF NOT EXISTS flats (
+    sql_create_flats_table = """CREATE TABLE IF NOT EXISTS flats(
                                     ad_id integer PRIMARY KEY,
-                                    date_added real NOT NULL,
+                                    date_added text NOT NULL,
                                     location text NOT NULL,
-                                    price text,
+                                    price integer,
                                     seller text,
                                     property_type text,
-                                    num_rooms text,
-                                    num_bathrooms text,
+                                    num_rooms integer,
+                                    num_bathrooms integer,
                                     flat_area integer,
                                     parking text,
                                     description text,

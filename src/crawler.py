@@ -1,5 +1,4 @@
 import scrapy
-from lxml import html
 
 
 class BlogSpider(scrapy.Spider):
@@ -14,11 +13,11 @@ class BlogSpider(scrapy.Spider):
                 'page_address': flat.css('a::attr("href")').get()
             }
 
-        # next_page = response.css('a.arrows.icon-right-arrow.icon-angle-right-gray').attrib["href"]
-        #
-        # if str(next_page)[-1] == '4':
-        #     exit()
-        #
-        # print(f"NEXT PAGE: {next_page}")
-        # if next_page is not None:
-        #     yield response.follow(next_page, self.parse)
+        next_page = response.css('a.arrows.icon-right-arrow.icon-angle-right-gray').attrib["href"]
+
+        if str(next_page)[-1] == '2':
+            exit()
+
+        print(f"NEXT PAGE: {next_page}")
+        if next_page is not None:
+            yield response.follow(next_page, self.parse)

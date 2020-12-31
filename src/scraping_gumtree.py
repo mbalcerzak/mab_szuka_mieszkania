@@ -4,11 +4,8 @@ import json
 import re
 
 
-# TODO what if everything si empty
-
-
 def get_price(soup) -> str:
-    results = soup.find(id="wrapper")
+    results = soup.find('div', class_="vip-title clearfix")
     price = results.find('span', class_='amount')
 
     return re.sub("[^\d\.,]", "", price.text)
@@ -16,7 +13,7 @@ def get_price(soup) -> str:
 
 def get_description(soup) -> dict:
     results = soup.find(id="wrapper")
-    description = results.find('div', class_='description')
+    description = results.find('span', class_='pre')
 
     return {"description": description.text}
 
@@ -50,7 +47,6 @@ def get_attributes(soup) -> dict:
         if attr_name not in attr_dict:
             if attr_name in ['Liczba pokoi', 'Liczba łazienek']:
                 attr_val = extract_num(attr_val)
-                print(attr_name, attr_val)
             attr_dict[attr_name] = attr_val
 
     return attr_dict
@@ -72,14 +68,14 @@ class Flat:
         self.ad_id = ad_id
         self.price = price
 
-        self.description = ''
-        self.date_added = ''
-        self.seller = ''
-        self.property_type = ''
-        self.num_rooms = ''
-        self.num_bathrooms = ''
+        self.description = 'NA'
+        self.date_added = 'NA'
+        self.seller = 'NA'
+        self.property_type = 'NA'
+        self.num_rooms = 0
+        self.num_bathrooms = 1
         self.flat_area = 0
-        self.parking = ''
+        self.parking = 'NA'
 
         for key, value in kwargs.items():
             if key in keys_dict:
@@ -96,7 +92,7 @@ def get_flat_info(link) -> list:
     page = requests.get(link)
     soup = BeautifulSoup(page.content, 'html.parser')
 
-    ad_id = link.split('/')[-1]
+    ad_id = link.split('/')[-1][3:12]
     price = get_price(soup)
 
     description = get_description(soup)
