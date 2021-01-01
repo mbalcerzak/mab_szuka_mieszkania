@@ -30,7 +30,8 @@ def main():
     sql_create_flats_table = """CREATE TABLE IF NOT EXISTS flats(
                                     ad_id integer PRIMARY KEY,
                                     title text NOT NULL,
-                                    date_added text NOT NULL,
+                                    date_posted text NOT NULL,
+                                    date_scraped text NOT NULL,
                                     location text NOT NULL,
                                     price integer,
                                     seller text,
@@ -40,14 +41,15 @@ def main():
                                     flat_area integer,
                                     parking text,
                                     description text,
-                                    photos_links text );
+                                    photos_links text, 
+                                    price_history text);
                                 """
 
     conn = create_connection(database)
 
     if conn is not None:
         create_table(conn, sql_create_flats_table)
-        print("Created! Or it was already there...")
+        print("Created!")
     else:
         print("Error! Cannot create the database connection")
 
