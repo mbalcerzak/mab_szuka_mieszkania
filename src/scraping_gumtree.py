@@ -1,3 +1,4 @@
+from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -61,7 +62,7 @@ def get_attributes(soup) -> dict:
 
 
 keys_dict = {
-    'Data dodania': 'date_added',
+    'Data dodania': 'date_posted',
     'Lokalizacja': 'location',
     'Na sprzedaż przez': 'seller',
     'Rodzaj nieruchomości': 'property_type',
@@ -78,13 +79,20 @@ class Flat:
         self.title = title
 
         self.description = 'NA'
-        self.date_added = 'NA'
+        self.date_posted = 'NA'
         self.seller = 'NA'
         self.property_type = 'NA'
         self.num_rooms = 0
         self.num_bathrooms = 1
         self.flat_area = 0
         self.parking = 'Brak'
+
+        today = datetime.today().strftime('%d/%m/%Y')
+        self.date_scraped = today
+
+        price_history = {today: price}
+        self.price_history = str(price_history)
+        print(str(price_history))
 
         for key, value in kwargs.items():
             if key in keys_dict:
@@ -114,6 +122,43 @@ def get_flat_info(link) -> list:
     return Flat(ad_id, price, title, **ad_attributes)
 
 
+def check_if_id_exists(cursor, flat):
+    cursor.execute(f'SELECT * FROM flats WHERE ad_id = {flat.ad_id}')
+    return True if len(cursor.fetchall()) != 0 else False
+
+
+def check_if_price_changed(cursor, flat):
+    new_price = int(flat.price)
+    cursor.execute(f'SELECT price FROM flats WHERE ad_id = {flat.ad_id}')
+    old_price = cursor.fetchone()[0]
+
+    today = datetime.today().strftime('%d/%m/%Y')
+
+    if old_price != new_price:
+        print(f"{old_price=} is different than the {new_price=}")
+
+        cursor.execute(f'SELECT price_history FROM flats WHERE ad_id = {flat.ad_id}')
+        price_history = cursor.fetchone()[0]
+
+        price_history = eval(price_history)
+        print(price_history)
+
+        if str(today) not in price_history:
+            price_history[today] = new_price
+
+            cursor.execute(f"UPDATE flats SET price_history = \"{price_history}\""
+                           f" WHERE ad_id = {flat.ad_id}")
+            print(price_history)
+
+        cursor.execute(f'UPDATE flats SET price = {flat.price} ' 
+                       f'WHERE ad_id = {flat.ad_id}')
+    else:
+        print("This flat still has the same price, all good")
+
+    cursor.execute(f'UPDATE flats SET date_scraped = \'{today}\' ' 
+                   f'WHERE ad_id = {flat.ad_id}')
+
+
 def add_flat(flat):
     try:
         conn = sqlite3.connect('../data/flats.db')
@@ -125,7 +170,8 @@ def add_flat(flat):
     input_ = (f"INSERT INTO flats VALUES ("
                    f"{flat.ad_id}, "
                    f"'{flat.title}', "
-                   f"'{flat.date_added}', "
+                   f"'{flat.date_posted}', "
+                   f"'{flat.date_scraped}', "
                    f"'{flat.location}', "
                    f"{flat.price}, "
                    f"'{flat.seller}', "
@@ -135,17 +181,24 @@ def add_flat(flat):
                    f"{flat.flat_area}, "
                    f"'{flat.parking}', "
                    f"\"{flat.description}\", "
-                   f"\"{flat.photos_links}\""
+                   f"\"{flat.photos_links}\", "
+                   f"\"{flat.price_history}\""
                    ")")
 
-    try:
-        cursor.execute(input_)
-        conn.commit()
-    except sqlite3.Error as e:
-        print(e)
-
-    # cursor.execute('SELECT * FROM flats')
-    # print(cursor.fetchone())
+    if check_if_id_exists(cursor, flat):
+        print(f"Row with that ID ({flat.ad_id}) already is in the database, "
+              f"checking if the price changed")
+        check_if_price_changed(cursor, flat)
+        try:
+            conn.commit()
+        except sqlite3.Error as e:
+            print(e)
+    else:
+        try:
+            cursor.execute(input_)
+            conn.commit()
+        except sqlite3.Error as e:
+            print(e)
 
     conn.close()
 
@@ -154,3 +207,5 @@ if __name__ == "__main__":
     ad_link = '/a-mieszkania-i-domy-sprzedam-i-kupie/zoliborz/mieszkanie-warszawa-zoliborz-55m2-nr-sol+ms+137199+2/1008618526330911559470109'
     flat1 = get_flat_info(ad_link)
     flat1.show_attr()
+
+    add_flat(flat1)
