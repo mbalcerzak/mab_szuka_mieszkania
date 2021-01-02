@@ -20,12 +20,8 @@ def create_table(conn, create_table_sql):
         print(e)
 
 
-def db_path():
-    return '../data/flats.db'
-
-
 def main():
-    database = db_path()
+    database = '../data/flats.db'
 
     sql_create_flats_table = """CREATE TABLE IF NOT EXISTS flats(
                                     ad_id integer PRIMARY KEY,

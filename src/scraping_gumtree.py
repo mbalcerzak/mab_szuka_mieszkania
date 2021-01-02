@@ -22,6 +22,10 @@ def get_description(soup) -> dict:
 
 def get_photos(soup) -> dict:
     gallery = soup.find(id="vip-gallery-data")
+
+    if gallery is None:
+        return {"photos_links": ['No photos']}
+
     pattern = re.compile('\{.*\}')
     json_obj = json.loads(re.findall(pattern, str(gallery))[0])
 
@@ -92,7 +96,6 @@ class Flat:
 
         price_history = {today: price}
         self.price_history = str(price_history)
-        print(str(price_history))
 
         for key, value in kwargs.items():
             if key in keys_dict:
@@ -110,8 +113,12 @@ def get_flat_info(link) -> list:
     soup = BeautifulSoup(page.content, 'html.parser')
 
     ad_id = link.split('/')[-1][3:12]
-    price = get_price(soup)
+    try:
+        price = get_price(soup)
+    except AttributeError:
+        return None
     title = get_add_title(soup)
+    print(title)
 
     description = get_description(soup)
     photos_links = get_photos(soup)
@@ -137,18 +144,17 @@ def check_if_price_changed(cursor, flat):
     if old_price != new_price:
         print(f"{old_price=} is different than the {new_price=}")
 
-        cursor.execute(f'SELECT price_history FROM flats WHERE ad_id = {flat.ad_id}')
+        cursor.execute(f'SELECT price_history FROM flats '
+                       f'WHERE ad_id = {flat.ad_id}')
         price_history = cursor.fetchone()[0]
-
         price_history = eval(price_history)
-        print(price_history)
 
         if str(today) not in price_history:
             price_history[today] = new_price
 
-            cursor.execute(f"UPDATE flats SET price_history = \"{price_history}\""
-                           f" WHERE ad_id = {flat.ad_id}")
-            print(price_history)
+            cursor.execute(f"UPDATE flats "
+                           f"SET price_history = \"{price_history}\" "
+                           f"WHERE ad_id = {flat.ad_id}")
 
         cursor.execute(f'UPDATE flats SET price = {flat.price} ' 
                        f'WHERE ad_id = {flat.ad_id}')
@@ -159,7 +165,12 @@ def check_if_price_changed(cursor, flat):
                    f'WHERE ad_id = {flat.ad_id}')
 
 
-def add_flat(flat):
+def add_flat(flat, update=False):
+    try:
+        x = flat.price
+    except AttributeError:
+        print("Invalid price, skipping the ad")
+        return None
     try:
         conn = sqlite3.connect('../data/flats.db')
         cursor = conn.cursor()
@@ -167,44 +178,57 @@ def add_flat(flat):
     except sqlite3.Error as e:
         raise Exception
 
-    input_ = (f"INSERT INTO flats VALUES ("
-                   f"{flat.ad_id}, "
-                   f"'{flat.title}', "
-                   f"'{flat.date_posted}', "
-                   f"'{flat.date_scraped}', "
-                   f"'{flat.location}', "
-                   f"{flat.price}, "
-                   f"'{flat.seller}', "
-                   f"'{flat.property_type}', "
-                   f"{flat.num_rooms}, "
-                   f"{flat.num_bathrooms}, "
-                   f"{flat.flat_area}, "
-                   f"'{flat.parking}', "
-                   f"\"{flat.description}\", "
-                   f"\"{flat.photos_links}\", "
-                   f"\"{flat.price_history}\""
-                   ")")
-
     if check_if_id_exists(cursor, flat):
-        print(f"Row with that ID ({flat.ad_id}) already is in the database, "
-              f"checking if the price changed")
-        check_if_price_changed(cursor, flat)
-        try:
-            conn.commit()
-        except sqlite3.Error as e:
-            print(e)
+        if update:
+            print(f"Row with that ID ({flat.ad_id}) already is in the database,"
+                  f" checking if the price changed")
+            check_if_price_changed(cursor, flat)
+            try:
+                conn.commit()
+            except sqlite3.Error as e:
+                print(e)
+        else:
+            print(
+                f"Row with that ID ({flat.ad_id}) already is in the database, "
+                f"skipping")
     else:
+        input_ = (f"INSERT INTO flats VALUES ("
+                  f"{flat.ad_id}, "
+                  f"'{flat.title}', "
+                  f"'{flat.date_posted}', "
+                  f"'{flat.date_scraped}', "
+                  f"'{flat.location}', "
+                  f"{flat.price}, "
+                  f"'{flat.seller}', "
+                  f"'{flat.property_type}', "
+                  f"{flat.num_rooms}, "
+                  f"{flat.num_bathrooms}, "
+                  f"{flat.flat_area}, "
+                  f"'{flat.parking}', "
+                  f"\"{flat.description}\", "
+                  f"\"{flat.photos_links}\", "
+                  f"\"{flat.price_history}\""
+                  ")")
         try:
             cursor.execute(input_)
             conn.commit()
         except sqlite3.Error as e:
             print(e)
+        print("New input added successfully")
 
     conn.close()
 
 
 if __name__ == "__main__":
-    ad_link = '/a-mieszkania-i-domy-sprzedam-i-kupie/zoliborz/mieszkanie-warszawa-zoliborz-55m2-nr-sol+ms+137199+2/1008618526330911559470109'
+    # example with photos
+    # ad_link = '/a-mieszkania-i-domy-sprzedam-i-kupie/zoliborz/mieszkanie-warszawa-zoliborz-55m2-nr-sol+ms+137199+2/1008618526330911559470109'
+
+    # no photos
+    # ad_link = '/a-mieszkania-i-domy-sprzedam-i-kupie/bielany/3-pokoje-na-zamknietym-monitorowanym-osiedlu-przy-multikinie-mlociny/1008627292720912407250109'
+
+    # no amount
+    ad_link = '/a-mieszkania-i-domy-sprzedam-i-kupie/mokotow/3-pokoje-z-balkonem/1008627031860912407250109'
+
     flat1 = get_flat_info(ad_link)
     flat1.show_attr()
 
