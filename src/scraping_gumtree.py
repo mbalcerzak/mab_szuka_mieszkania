@@ -5,7 +5,6 @@ import json
 import re
 import sqlite3
 
-#TODO at some point make it run faster
 
 def get_price(soup) -> str:
     results = soup.find('div', class_="vip-title clearfix")
@@ -114,7 +113,10 @@ def get_flat_info(link) -> list:
     soup = BeautifulSoup(page.content, 'html.parser')
 
     ad_id = link.split('/')[-1][3:12]
-    price = get_price(soup)
+    try:
+        price = get_price(soup)
+    except AttributeError:
+        return None
     title = get_add_title(soup)
     print(title)
 
@@ -142,15 +144,17 @@ def check_if_price_changed(cursor, flat):
     if old_price != new_price:
         print(f"{old_price=} is different than the {new_price=}")
 
-        cursor.execute(f'SELECT price_history FROM flats WHERE ad_id = {flat.ad_id}')
+        cursor.execute(f'SELECT price_history FROM flats '
+                       f'WHERE ad_id = {flat.ad_id}')
         price_history = cursor.fetchone()[0]
         price_history = eval(price_history)
 
         if str(today) not in price_history:
             price_history[today] = new_price
 
-            cursor.execute(f"UPDATE flats SET price_history = \"{price_history}\""
-                           f" WHERE ad_id = {flat.ad_id}")
+            cursor.execute(f"UPDATE flats "
+                           f"SET price_history = \"{price_history}\" "
+                           f"WHERE ad_id = {flat.ad_id}")
 
         cursor.execute(f'UPDATE flats SET price = {flat.price} ' 
                        f'WHERE ad_id = {flat.ad_id}')
@@ -161,8 +165,11 @@ def check_if_price_changed(cursor, flat):
                    f'WHERE ad_id = {flat.ad_id}')
 
 
-def add_flat(flat):
-    if flat.price is None:
+def add_flat(flat, update=False):
+    try:
+        x = flat.price
+    except AttributeError:
+        print("Invalid price, skipping the ad")
         return None
     try:
         conn = sqlite3.connect('../data/flats.db')
@@ -171,33 +178,37 @@ def add_flat(flat):
     except sqlite3.Error as e:
         raise Exception
 
-    input_ = (f"INSERT INTO flats VALUES ("
-                   f"{flat.ad_id}, "
-                   f"'{flat.title}', "
-                   f"'{flat.date_posted}', "
-                   f"'{flat.date_scraped}', "
-                   f"'{flat.location}', "
-                   f"{flat.price}, "
-                   f"'{flat.seller}', "
-                   f"'{flat.property_type}', "
-                   f"{flat.num_rooms}, "
-                   f"{flat.num_bathrooms}, "
-                   f"{flat.flat_area}, "
-                   f"'{flat.parking}', "
-                   f"\"{flat.description}\", "
-                   f"\"{flat.photos_links}\", "
-                   f"\"{flat.price_history}\""
-                   ")")
-
     if check_if_id_exists(cursor, flat):
-        print(f"Row with that ID ({flat.ad_id}) already is in the database, "
-              f"checking if the price changed")
-        check_if_price_changed(cursor, flat)
-        try:
-            conn.commit()
-        except sqlite3.Error as e:
-            print(e)
+        if update:
+            print(f"Row with that ID ({flat.ad_id}) already is in the database,"
+                  f" checking if the price changed")
+            check_if_price_changed(cursor, flat)
+            try:
+                conn.commit()
+            except sqlite3.Error as e:
+                print(e)
+        else:
+            print(
+                f"Row with that ID ({flat.ad_id}) already is in the database, "
+                f"skipping")
     else:
+        input_ = (f"INSERT INTO flats VALUES ("
+                  f"{flat.ad_id}, "
+                  f"'{flat.title}', "
+                  f"'{flat.date_posted}', "
+                  f"'{flat.date_scraped}', "
+                  f"'{flat.location}', "
+                  f"{flat.price}, "
+                  f"'{flat.seller}', "
+                  f"'{flat.property_type}', "
+                  f"{flat.num_rooms}, "
+                  f"{flat.num_bathrooms}, "
+                  f"{flat.flat_area}, "
+                  f"'{flat.parking}', "
+                  f"\"{flat.description}\", "
+                  f"\"{flat.photos_links}\", "
+                  f"\"{flat.price_history}\""
+                  ")")
         try:
             cursor.execute(input_)
             conn.commit()
