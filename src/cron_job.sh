@@ -1,1 +1,1 @@
-scrapy runspider crawler.py -o flats.jl
+scrapy runspider crawler.py -o ../data/flats.jl

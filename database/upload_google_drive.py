@@ -29,7 +29,7 @@ def main():
 		f.Upload()
 		f = None
 
-	print("Uploaded " + len(os.listdir(path + "/data")) + " files")
+	print("Uploaded " + str(len(os.listdir(path + "/data"))) + " files")
 
 	copyfile(path + "/data/flats.db", path + f"/archive/flats_{today}.db")
 

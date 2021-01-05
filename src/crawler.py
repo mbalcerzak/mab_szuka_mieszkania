@@ -2,7 +2,6 @@ import logging
 import scrapy
 import webbrowser
 from datetime import date
-
 from scraping_gumtree import get_flat_info, add_flat
 
 logging.getLogger('scrapy').setLevel(logging.WARNING)
@@ -31,8 +30,11 @@ class BlogSpider(scrapy.Spider):
                 'page_address': page_address,
                 'date': date.today()
             }
+
+            # TODO check price from the "outside"
+            # TODO check if the page has already been scraped and only then move on
             flat = get_flat_info(page_address)
-            add_flat(flat, update=False)
+            add_flat(flat)
             i += 1
 
         try:
@@ -41,5 +43,5 @@ class BlogSpider(scrapy.Spider):
                 print(f"\n   (   NEXT PAGE: {next_page}   )")
                 yield response.follow(next_page, self.parse)
 
-        except KeyError as ke:
+        except KeyError:
             print("I think we reached our 50 pages. KeyError occurred.")

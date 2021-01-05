@@ -6,6 +6,6 @@ archive/
 
 *.jl
 playground.py
-mycreds.txt
+database/mycreds.txt
 
 __pycache__/
