@@ -91,10 +91,10 @@ class Flat:
         self.num_bathrooms = 1
         self.flat_area = 0
         self.parking = 'Brak'
-        self.price_history = '{}'
 
         today = datetime.today().strftime('%d/%m/%Y')
         self.date_scraped = today
+        self.price_history = '{}'
 
         for key, value in kwargs.items():
             if key in keys_dict:
@@ -133,49 +133,52 @@ def check_if_id_exists(cursor, flat):
     return True if len(cursor.fetchall()) != 0 else False
 
 
-def update_price(cursor, flat, new_price):
+def check_if_price_changed(cursor, flat):
+    new_price = int(flat.price)
+    cursor.execute(f'SELECT price FROM flats WHERE ad_id = {flat.ad_id}')
+    old_price = int(cursor.fetchone()[0])
+
+    if old_price != new_price:
+        print(f"{old_price=} and {new_price=} are different")
+        update_price(cursor, flat, old_price, new_price)
+
+
+def update_price(cursor, flat, old_price, new_price):
     today = datetime.today().strftime('%d/%m/%Y')
     cursor.execute(f'SELECT price_history FROM flats '
                    f'WHERE ad_id = {flat.ad_id}')
-
     price_history = eval(cursor.fetchone()[0])
+
+    cursor.execute(f'SELECT date_scraped FROM flats '
+                   f'WHERE ad_id = {flat.ad_id}')
+    previous_date = cursor.fetchone()[0]
+
+    if str(previous_date) not in price_history:
+        price_history[previous_date] = old_price
 
     if str(today) not in price_history:
         price_history[today] = new_price
 
-        cursor.execute(f"UPDATE flats "
-                       f"SET price_history = \"{price_history}\" "
-                       f"WHERE ad_id = {flat.ad_id}")
-
-    cursor.execute(f'UPDATE flats '
-                   f'SET price = {new_price}, date_scraped = \'{today}\' ' 
-                   f'WHERE ad_id = {flat.ad_id}')
+    cursor.execute(f"UPDATE flats "
+                   f"SET price_history = \"{price_history}\", "
+                   f"    price = {new_price}, "
+                   f"    date_scraped = \'{today}\'"
+                   f"WHERE ad_id = {flat.ad_id}")
 
 
-def check_if_price_changed(cursor, flat):
-    new_price = int(flat.price)
-    cursor.execute(f'SELECT price FROM flats WHERE ad_id = {flat.ad_id}')
-    old_price = cursor.fetchone()[0]
-
-    if old_price != new_price:
-        update_price(cursor, flat, new_price)
-        return True
-    else:
-        return False
-
-
+# TODO remove one day - temporary solution
 def check_if_page_address_exists(cursor, flat):
     cursor.execute(f'SELECT page_address FROM flats WHERE ad_id = {flat.ad_id}')
-    return True if len(cursor.fetchall()) != 0 else False
+    return False if len(cursor.fetchone()[0]) == 0 else True
 
 
 def update_page_address_empty(cursor, flat):
     cursor.execute(f'UPDATE flats SET page_address = \"{flat.page_address}\" ' 
                    f'WHERE ad_id = {flat.ad_id}')
-    print("Page address updated")
+    print("Page address was missing - added")
 
 
-def add_flat(flat, update=False):
+def add_flat(flat):
     try:
         x = flat.price
         # TODO poprawić tę paskudę
@@ -189,21 +192,14 @@ def add_flat(flat, update=False):
         raise Exception
 
     if check_if_id_exists(cursor, flat):
-        # TODO delete later, temporary solution
-        if check_if_page_address_exists(cursor, flat):
-            print("No page address - updating")
+        print(f"Row with that ID ({flat.ad_id}) already is in the database")
+
+        if not check_if_page_address_exists(cursor, flat):
             update_page_address_empty(cursor, flat)
             conn.commit()
 
-        print(f"Row with that ID ({flat.ad_id}) already is in the database")
+        check_if_price_changed(cursor, flat)
 
-        if update:
-            # TODO save price in history only if it ever changed
-            if check_if_price_changed(cursor, flat):
-                try:
-                    conn.commit()
-                except sqlite3.Error as e:
-                    print(e)
     else:
         input_ = (f"INSERT INTO flats VALUES ("
                   f"{flat.ad_id}, "
@@ -223,13 +219,9 @@ def add_flat(flat, update=False):
                   f"\"{flat.price_history}\", "
                   f"\"{flat.page_address}\""
                   ")")
-        try:
-            cursor.execute(input_)
-            conn.commit()
-            print("New input added successfully")
-        except sqlite3.Error as e:
-            print(e)
+        cursor.execute(input_)
 
+    conn.commit()
     conn.close()
 
 
@@ -249,4 +241,4 @@ if __name__ == "__main__":
     flat_example = get_flat_info(ad_link)
     flat_example.show_attr()
 
-    add_flat(flat_example, update=False)
+    add_flat(flat_example)

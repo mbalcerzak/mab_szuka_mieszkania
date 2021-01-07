@@ -1,17 +1,14 @@
 import logging
 import scrapy
 import webbrowser
-from datetime import date
+import re
 from scraping_gumtree import get_flat_info, add_flat
 
 logging.getLogger('scrapy').setLevel(logging.WARNING)
 
 
 class BlogSpider(scrapy.Spider):
-
-    name = 'gumtree'
     start_urls = [
-        # 'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/warszawa/mieszkanie/v1c9073l3200008a1dwp1?priceType=FIXED',
         'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/warszawa/mieszkanie/v1c9073l3200008a1dwp1?df=ownr&priceType=FIXED',
         'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/praga-poludnie/mieszkanie/v1c9073l3200015a1dwp1?priceType=FIXED',
         'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/praga-polnoc/mieszkanie/v1c9073l3200014a1dwp1?priceType=FIXED',
@@ -23,12 +20,14 @@ class BlogSpider(scrapy.Spider):
     def parse(self, response):
         i = 1
         for flat in response.css('div.tileV1'):
-            print("\n")
-            print("-"*100 + " " + str(i))
+            print("\n" + "-"*100 + " " + str(i))
+
             page_address = flat.css('a::attr("href")').get()
+            ad_price = flat.css('span.ad-price::text').get()
+            ad_price = re.sub("[^\d\.,]", "", ad_price)
             yield {
                 'page_address': page_address,
-                'date': date.today()
+                'price': ad_price
             }
 
             # TODO check price from the "outside"
