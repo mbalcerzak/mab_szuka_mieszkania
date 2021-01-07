@@ -1,51 +1,54 @@
-# Projekt pomocniczy do szukania mieszkania
+# It's not procrastinating if it's in Python
 
-Może szybciej było przeglądać jedno ogłoszenie po drugim a nie pisać od razu apkę...? Nigdy się nie dowiemy :P
+Maybe it would be faster to browse one ad after another and not write an app right away...? 
+I guess we'll never know...
 
-#### Informacje z ogłoszenia:
-- cena mieszkania
-- dzielnica
-- wielkość mieszkania
-- które piętro
-- czy mamy rzut mieszkania
-- ile pokoi
-- zdjęcia
+#### Information from the announcement:
+- the price of the apartment
+- district
+- the size of the apartment
+- do we have a flat projection
+- how many rooms
+- what does it look on pictures
 
-#### Dodatkowe informacje z tekstu:
-- dokładna lokalizacja
-- wysokość czynszu
-- czy jest balkon
-- rok budowy
-- cechy okolicy
-- komórka / piwnica?
+#### Additional information from the text:
+- exact location - which street
+- which floor
+- rent amount
+- is there a balcony / loggia / terrace
+- year of construction
+- what's in the vicinity
+- storage room downstairs / basement
+- garage? (+ how much)
 
-#### Wyliczyć sobie później:
-- odległość do stacji metra
-- odległość od parku
-- jaki dojazd do mojej siłowni (!!!)
-- cena za metr
-
+#### Calculate later:
+- distance to the metro station
+- distance from the park
+- how to get to my gym (!!!)
+- average price per meter
 
 > LOCATION, LOCATION, LOCATION
 
-
-# Plan 
-1. Zebrać dane ze wszystkich ogłoszeń (+zdjęcia)
-2. Wyczyścić dane 
-3. Przechowywać dane w jakiś sensowny sposób
-4. Strona we Flasku do przeglądania wybranych ofert - wg moich kryteriów + wszysktie zdjęcia na raz
-5. Analiza wykrycie anomiali?
-    - średnia cena za metr w dzielnicy
-6. Podgląd na mapie (jak daleko do Goryla) i mapa [akustyczna Wawy](http://mapa.um.warszawa.pl/mapaApp1/mapa?service=mapa_akustyczna&L=PL&X=7501841.83526767&Y=5782957.86084302&S=15&O=0&T=7dffc0100100001007fff004xA9)  
-
-
-? dodać info, że ogłoszenie zostało zdjęte z datą?
-
-? Gumtree, OtoDom, Olx ? Tylko te strony?
+# Plan
+1. Collect data from all ads (+ photos)
+2. Clean data
+3. Store data in a meaningful way (+ cloud backup)
+4. Website in Flask to view selected offers - according to my criteria + all photos at once
+5. Anomaly detection analysis?
+    - average price per meter in the district
+    - notification when a new ad is _sus_
+6. Preview on the map (how far to Gorilla) and the [acoustic map of Warsaw](http://mapa.um.warszawa.pl/mapaApp1/mapa?service=mapa_akustyczna&L=PL&X=7501841.83526767&Y=5782957.86084302&S=15&O=0&T=7dffc0100100001007fff004xA9)  
+7. Check if the advertisement is still hanging (add the date on which it disappeared)
+8. Check occasionally if the price hasn't changed (to get the feeling of real prices :P)
 
 
-## Założenia
-1. Każde mieszkanie ma min. jedną łazienkę - więc jeśli nie ma o niej informacji w ogłoszeniu, wypełniam _missing value_ jako 1
+## Assumptions
+1. Each apartment has one bathroom minimum - so if it is not mentioned in the advertisement, the default value of num_bathrooms is 1
+2. When the price is changed, the ad ID remains the same
+3. If the "flat" costs less than PLN 100,000, it probably means the exchange / sharing of ownership and I do not want to have this advertisement in the database
+4. Only one price change per day can be saved in the database
 
 
-chcę znać historię cen, żeby wiedzieć kto jest najbardziej zdesperowany
+## New plan?
+Perhaps just an app in Flask to check the distance from many places at once.
+New apartment address - gym, dance school ... at different times

@@ -3,9 +3,8 @@
 data/
 auth/
 archive/
+__pycache__/
 
 *.jl
 playground.py
-mycreds.txt
-
-__pycache__/
+database/mycreds.txt
