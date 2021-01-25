@@ -1,0 +1,11 @@
+.venv
+venv
+.idea
+data/
+auth/
+archive/
+__pycache__/
+
+*.jl
+playground.py
+database/mycreds.txt
