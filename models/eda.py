@@ -1,5 +1,4 @@
 import sqlite3
-from builtins import eval
 
 
 def connection():
@@ -11,37 +10,29 @@ def connection():
     return conn
 
 
-def get_price_history(c) -> list:
-    c.execute('SELECT count(*) FROM flats WHERE price_history != \'{}\'')
-    print(f"There are {c.fetchone()[0]} ads for which the price has changed")
-
-    c.execute('SELECT price, price_history FROM flats WHERE price_history != \'{}\'')
-    return c.fetchall()
-
-
-def main():
+def print_count():
     c = connection().cursor()
-    price_history_list = get_price_history(c)
-    print(price_history_list)
 
-    for elem in price_history_list:
-        current_price = elem[0]
-        price_history = eval(elem[1])
-        date_posted = min(price_history)
-        original_price = price_history[date_posted]
+    for col in ['date_scraped', 'location', 'num_rooms']:
+        print(col.upper())
 
-        print(price_history, current_price)
+        c.execute(f"SELECT {col}, count({col}) as how_many FROM flats GROUP BY {col}")
+        for elem in c.fetchall():
+            print(f"{elem}")
 
-        for date, price_change in price_history.items():
-            if date != date_posted:
-                difference = round((int(price_change) - int(original_price))/int(original_price), 4) * 100
-                print(f"{date}| {original_price} -> {price_change} | {difference:.2f} %")
-            elif price_change != current_price:
-                difference = round((int(current_price) - int(original_price)) / int(original_price), 4) * 100
-                print(f"{date}| {original_price} -> {current_price} | {difference:.2f} %")
+        print("-"*80)
 
-        print("-" * 40)
+    c.execute(f"SELECT location, num_rooms, count(num_rooms) as how_many FROM flats GROUP BY location, num_rooms")
+    print("LOCATION + NUM_ROOMS")
+    for elem in c.fetchall():
+        print(f"{elem}")
+
+    print("-" * 80)
+
+    c.execute(f"SELECT count(*) FROM flats")
+    all_ads = c.fetchone()[0]
+    print(f"Scraped overall: {all_ads} ads")
 
 
 if __name__ == "__main__":
-    main()
+    print_count()

@@ -22,7 +22,7 @@ def check_if_price_changed(cursor, ad_id, ad_price):
     old_price = cursor.fetchone()[0]
 
     if int(old_price) != int(ad_price):
-        print("Price has changed")
+        print(f"Price has changed {old_price} -> {ad_price}")
         return True
     else:
         print("Price is still the same.")
