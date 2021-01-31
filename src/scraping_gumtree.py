@@ -55,9 +55,7 @@ def extract_num_rooms(text: str) -> int:
 
 
 def change_date_str(text: str) -> str:
-    print(text)
     dd,mm,yyyy = text.split('/')
-    print(f"{yyyy}-{mm}-{dd}")
     return f"{yyyy}-{mm}-{dd}"
 
 
@@ -133,7 +131,7 @@ def get_flat_info(page_address) -> dict:
     return flat
 
 
-def add_flat(page_address, cursor):
+def add_flat(page_address, cursor, conn):
     print("Adding a new flat")
     flat = get_flat_info(page_address)
 
@@ -154,6 +152,7 @@ def add_flat(page_address, cursor):
                   f"\"{flat['page_address']}\""
                   ")")
     cursor.execute(input_flat)
+    conn.commit()
 
     input_price = (f"INSERT INTO prices VALUES("
                    "NULL, "
@@ -163,6 +162,7 @@ def add_flat(page_address, cursor):
                    ")")
 
     cursor.execute(input_price)
+    conn.commit()
 
 
 if __name__ == "__main__":

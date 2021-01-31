@@ -14,12 +14,11 @@ logging.getLogger('scrapy').setLevel(logging.WARNING)
 class BlogSpider(scrapy.Spider):
     name = "gumtree"
     start_urls = [
-        # 'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/warszawa/mieszkanie/v1c9073l3200008a1dwp1?df=ownr&priceType=FIXED',
-        # 'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/praga-poludnie/mieszkanie/v1c9073l3200015a1dwp1?priceType=FIXED',
-        # 'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/praga-polnoc/mieszkanie/v1c9073l3200014a1dwp1?priceType=FIXED',
-        # 'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/wola/mieszkanie/v1c9073l3200025a1dwp1?priceType=FIXED',
-        # 'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/srodmiescie/mieszkanie/v1c9073l3200017a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/praga-poludnie/mieszkanie/v1c9073l3200015a1dwp1?df=ownr&nr=10&pa=stret'
+        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/warszawa/mieszkanie/v1c9073l3200008a1dwp1?df=ownr&priceType=FIXED',
+        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/praga-poludnie/mieszkanie/v1c9073l3200015a1dwp1?priceType=FIXED',
+        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/praga-polnoc/mieszkanie/v1c9073l3200014a1dwp1?priceType=FIXED',
+        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/wola/mieszkanie/v1c9073l3200025a1dwp1?priceType=FIXED',
+        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/srodmiescie/mieszkanie/v1c9073l3200017a1dwp1?priceType=FIXED',
     ]
     # webbrowser.open(start_urls[0])
 
@@ -27,7 +26,7 @@ class BlogSpider(scrapy.Spider):
         i = 1
 
         try:
-            conn = sqlite3.connect('../data/flats_new.db')
+            conn = sqlite3.connect('../data/flats.db')
             # conn = sqlite3.connect(r'C:\Users\kkql180\NonWorkProjects\mab_szuka_mieszkania\data\flats_test.db')
             cursor = conn.cursor()
         except sqlite3.Error as e:
@@ -43,11 +42,10 @@ class BlogSpider(scrapy.Spider):
             if check_if_row_exists(cursor, ad_id):
                 if check_if_price_changed(cursor, ad_id, ad_price):
                     update_price(cursor, ad_id, ad_price)
-                    # pass
+                    conn.commit()
             else:
-                add_flat(page_address, cursor)
+                add_flat(page_address, cursor, conn)
 
-            conn.commit()
             i += 1
 
         try:

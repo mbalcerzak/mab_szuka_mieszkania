@@ -75,7 +75,7 @@ def create_database():
                                     photos_links,
                                     page_address FROM flats"""
 
-    sql_create_price_changes_table= """CREATE TABLE IF NOT EXISTS prices(
+    sql_create_price_changes_table= """CREATE TABLE prices(
                                             price_id integer PRIMARY KEY AUTOINCREMENT,
                                             flat_id integer NOT NULL,
                                             price integer,
@@ -83,15 +83,20 @@ def create_database():
                                             FOREIGN KEY(flat_id) REFERENCES flats_new(ad_id))   
                                      """
 
+    sql_remove_table_price = """ALTER TABLE flats_new RENAME TO flats"""
+
     conn = create_connection(database)
 
     if conn is not None:
-        create_table(conn, sql_create_flats_new_dsgn)
-        create_table(conn, sql_create_price_changes_table)
+        # create_table(conn, sql_create_flats_new_dsgn)
+
+        create_table(conn, sql_remove_table_price)
+        # create_table(conn, sql_create_price_changes_table)
         print("Created!")
     else:
         print("Error! Cannot create the database connection")
 
 
 if __name__ == '__main__':
-    create_database()
+    # create_database()
+    pass
