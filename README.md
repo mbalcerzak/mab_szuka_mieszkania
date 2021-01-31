@@ -32,6 +32,7 @@ I guess we'll never know...
 # Plan
 1. Collect data from all ads (+ photos)
 2. Clean data
+- price "370" means probably "370 000"
 3. Store data in a meaningful way (+ cloud backup)
 4. Website in Flask to view selected offers - according to my criteria + all photos at once
 5. Anomaly detection analysis?
@@ -43,12 +44,37 @@ I guess we'll never know...
 
 
 ## Assumptions
-1. Each apartment has one bathroom minimum - so if it is not mentioned in the advertisement, the default value of num_bathrooms is 1
-2. When the price is changed, the ad ID remains the same
-3. If the "flat" costs less than PLN 100,000, it probably means the exchange / sharing of ownership and I do not want to have this advertisement in the database
-4. Only one price change per day can be saved in the database -- #TODO not true if there are two tables
+1. Each apartment has one bathroom minimum even if it is not mentioned in the advertisement (the default value of num_bathrooms is 1)
+2. If the "flat" costs less than PLN 100,000, it probably means the exchange / sharing of ownership and I do not want to have this advertisement in the database
 
 
 ## New plan?
 Perhaps just an app in Flask to check the distance from many places at once.
 New apartment address - gym, dance school ... at different times
+
+
+## Ideas for exploration
+- Can we extract location from photos? Usually they only tell you street and it's not super specific
+
+## Serwisy ogłoszeniowe
+
+Free:
+ - www.gumtree.pl
+ - www.olx.pl
+ - www.bezposrednio.com
+ - www.domoklik.pl
+ - www.anonse.com
+ - www.najdom.pl
+ - www.nieruchomosci.net.pl
+ - www.sprzedajemy.pl
+
+Paid:
+ - www.domiporta.pl
+ - www.gratka.pl
+ - www.otodom.pl
+ - www.oferty.net
+ - www.nieruchomosci.pl
+ - www.morizon.pl
+ - www.domy.pl
+ - www.tabelaofert.pl
+ - www.nieruchomosci-online.pl

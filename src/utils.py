@@ -2,9 +2,13 @@ import re
 from datetime import datetime
 
 
+def today_str():
+    return datetime.today().strftime('%Y-%m-%d')
+
+
 def info_scraped_today(cursor):
     """Print how many ads were scraped today and how many there are in the whole database"""
-    today = datetime.today().strftime('%d/%m/%Y')
+    today = today_str()
     cursor.execute(f"SELECT count(*) FROM flats WHERE date_scraped = '{today}'")
     ads_today = cursor.fetchone()[0]
 

@@ -1,14 +1,5 @@
 import sqlite3
-from datetime import datetime
-
-
-def close_db():
-    try:
-        conn = sqlite3.connect('data/flats.db')
-        cursor = conn.cursor()
-    except sqlite3.Error as e:
-        raise Exception
-    conn.close()
+from utils import today_str
 
 
 def check_if_row_exists(cursor, ad_id):
@@ -23,9 +14,14 @@ def check_if_row_exists(cursor, ad_id):
 
 
 def check_if_price_changed(cursor, ad_id, ad_price):
-    cursor.execute(f'SELECT price FROM flats WHERE ad_id = "{ad_id}"')
-    old_price = int(cursor.fetchone()[0])
-    if old_price != int(ad_price):
+    """Check if the price from the website is the same as the latest price from the database"""
+    cursor.execute(f'SELECT price FROM prices '
+                   f'WHERE flat_id = "{ad_id}" '
+                   f'ORDER BY date DESC, price_id DESC '
+                   f'LIMIT 1')
+    old_price = cursor.fetchone()[0]
+
+    if int(old_price) != int(ad_price):
         print("Price has changed")
         return True
     else:
@@ -34,30 +30,10 @@ def check_if_price_changed(cursor, ad_id, ad_price):
 
 
 def update_price(cursor, ad_id, ad_price):
-    cursor.execute(f'SELECT price_history FROM flats '
-                   f'WHERE ad_id = "{ad_id}"')
-    price_history = eval(cursor.fetchone()[0])
-
-    cursor.execute(f'SELECT date_scraped FROM flats '
-                   f'WHERE ad_id = "{ad_id}"')
-    previous_date = cursor.fetchone()[0]
-
-    cursor.execute(f'SELECT price FROM flats '
-                   f'WHERE ad_id = "{ad_id}"')
-    old_price = int(cursor.fetchone()[0])
-    new_price = int(ad_price)
-    today = datetime.today().strftime('%d/%m/%Y')
-
-    if str(previous_date) not in price_history:
-        price_history[previous_date] = old_price
-
-    if str(today) not in price_history:
-        price_history[today] = new_price
-
-    cursor.execute(f"UPDATE flats "
-                   f"SET price_history = \"{price_history}\", "
-                   f"    price = {new_price}, "
-                   f"    date_scraped = \'{today}\'"
-                   f'WHERE ad_id = "{ad_id}"')
-
-    print(f"PRICE updated: {price_history}")
+    today = today_str()
+    cursor.execute(f"INSERT INTO prices VALUES("
+                   "NULL, "
+                   f"{ad_id}, "
+                   f"{ad_price}, "
+                   f"\'{today}\' "
+                   ")")
