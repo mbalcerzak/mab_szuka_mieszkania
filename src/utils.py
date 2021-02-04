@@ -15,7 +15,15 @@ def info_scraped_today(cursor):
     cursor.execute(f"SELECT count(*) FROM flats")
     all_ads = cursor.fetchone()[0]
 
-    print(f"Today we managed to scrape: {ads_today} new ads. \n Overall: {all_ads}")
+    cursor.execute(f"SELECT count(flat_id) FROM prices "
+                   f"WHERE flat_id in (SELECT flat_id from prices GROUP BY flat_id HAVING count(flat_id) > 2) "
+                   f"and date = '{today}' ")
+    price_changes = cursor.fetchone()[0]
+
+    print(f"Today we managed to scrape: \n"
+          f"   New ads today: {ads_today:,}\n"
+          f"   Overall: {all_ads:,}\n"
+          f"   Price changes today: {price_changes}")
 
 
 def get_ad_price(flat):

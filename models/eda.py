@@ -13,7 +13,7 @@ def connection():
 def print_count():
     c = connection().cursor()
 
-    for col in ['date_scraped', 'location', 'num_rooms']:
+    for col in ['date_scraped', 'date_posted', 'location', 'num_rooms']:
         print(col.upper())
 
         c.execute(f"SELECT {col}, count({col}) as how_many FROM flats GROUP BY {col}")

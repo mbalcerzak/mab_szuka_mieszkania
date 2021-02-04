@@ -1,8 +1,7 @@
 import logging
-import webbrowser
 import scrapy
 import sqlite3
-import re
+
 
 from scraping_gumtree import add_flat
 from update_flat_info import check_if_row_exists, check_if_price_changed, update_price
