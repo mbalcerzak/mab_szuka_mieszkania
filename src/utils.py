@@ -7,7 +7,8 @@ def today_str():
 
 
 def info_scraped_today(cursor):
-    """Print how many ads were scraped today and how many there are in the whole database"""
+    """Print how many ads were scraped today
+    and how many there are in the whole database"""
     today = today_str()
     cursor.execute(f"SELECT count(*) FROM flats WHERE date_scraped = '{today}'")
     ads_today = cursor.fetchone()[0]
@@ -16,7 +17,7 @@ def info_scraped_today(cursor):
     all_ads = cursor.fetchone()[0]
 
     cursor.execute(f"SELECT count(flat_id) FROM prices "
-                   f"WHERE flat_id in (SELECT flat_id from prices GROUP BY flat_id HAVING count(flat_id) > 2) "
+                   f"WHERE flat_id in (SELECT flat_id FROM prices GROUP BY flat_id HAVING count(flat_id) > 2) "
                    f"and date = '{today}' ")
     price_changes = cursor.fetchone()[0]
 
