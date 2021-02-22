@@ -26,7 +26,6 @@ class BlogSpider(scrapy.Spider):
         'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/wilanow/mieszkanie/v1c9073l3200023a1dwp1?priceType=FIXED',
         'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/ursynow/mieszkanie/v1c9073l3200020a1dwp1?priceType=FIXED'
     ]
-    # webbrowser.open(start_urls[0])
 
     def parse(self, response):
         i = 1
