@@ -2,7 +2,6 @@ import logging
 import scrapy
 import sqlite3
 
-
 from scraping_gumtree import add_flat
 from update_flat_info import check_if_row_exists, check_if_price_changed, update_price
 from utils import get_ad_price, get_page_address,info_scraped_today, get_next_page, get_page_info
@@ -32,7 +31,6 @@ class BlogSpider(scrapy.Spider):
 
         try:
             conn = sqlite3.connect('../data/flats.db')
-            # conn = sqlite3.connect(r'C:\Users\kkql180\NonWorkProjects\mab_szuka_mieszkania\data\flats_test.db')
             cursor = conn.cursor()
         except sqlite3.Error as e:
             raise Exception
@@ -46,8 +44,7 @@ class BlogSpider(scrapy.Spider):
 
             if check_if_row_exists(cursor, ad_id):
                 if check_if_price_changed(cursor, ad_id, ad_price):
-                    update_price(cursor, ad_id, ad_price)
-                    conn.commit()
+                    update_price(cursor, ad_id, ad_price, conn)
             else:
                 add_flat(page_address, cursor, conn)
 

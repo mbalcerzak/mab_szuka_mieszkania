@@ -1,4 +1,3 @@
-import sqlite3
 from utils import today_str
 
 
@@ -14,7 +13,10 @@ def check_if_row_exists(cursor, ad_id):
 
 
 def check_if_price_changed(cursor, ad_id, ad_price):
-    """Check if the price from the website is the same as the latest price from the database"""
+    """
+    Check if the price from the website is the same as the latest price
+    from the database
+    """
     cursor.execute(f'SELECT price FROM prices '
                    f'WHERE flat_id = "{ad_id}" '
                    f'ORDER BY date DESC, price_id DESC '
@@ -29,7 +31,7 @@ def check_if_price_changed(cursor, ad_id, ad_price):
         return False
 
 
-def update_price(cursor, ad_id, ad_price):
+def update_price(cursor, ad_id, ad_price, conn):
     today = today_str()
     cursor.execute(f"INSERT INTO prices VALUES("
                    "NULL, "
@@ -37,3 +39,4 @@ def update_price(cursor, ad_id, ad_price):
                    f"{ad_price}, "
                    f"\'{today}\' "
                    ")")
+    conn.commit()

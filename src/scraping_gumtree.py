@@ -2,7 +2,6 @@ import requests
 import json
 import re
 import sqlite3
-from datetime import datetime
 from bs4 import BeautifulSoup
 
 from utils import today_str
@@ -167,13 +166,12 @@ def add_flat(page_address, cursor, conn):
 
 if __name__ == "__main__":
     try:
-        # conn = sqlite3.connect('../data/flats.db')
-        conn = sqlite3.connect(r'C:\Users\kkql180\NonWorkProjects\mab_szuka_mieszkania\data\flats_new.db')
+        conn = sqlite3.connect('../data/flats.db')
         cursor = conn.cursor()
     except sqlite3.Error as e:
         raise Exception
 
-    ad_link = 'https://www.gumtree.pl/a-mieszkania-i-domy-sprzedam-i-kupie/praga-poludnie/3+pokoje-do-wejscia-super-widok-po-remoncie-kw-60m/1008747663390911379840409'
+    ad_link = 'X'
     flat_example = get_flat_info(ad_link)
     print(flat_example)
 
