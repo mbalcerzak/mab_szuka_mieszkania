@@ -48,15 +48,20 @@ I guess we'll never know...
 2. If the "flat" costs less than PLN 100,000, it probably means the exchange / sharing of ownership and I do not want to have this advertisement in the database
 
 
-## New plan?
-Perhaps just an app in Flask to check the distance from many places at once.
-New apartment address - gym, dance school ... at different times
+## Analysis
+An app in Flask. Features:
+- check the distance from many places at once. New apartment address - gym, 
+  dance school ... at different times
+- Show the ad in some other way
+- Graph showing tha flat's price (and changes) vs. average for the neighborhood
+- Flag parts of the ad that are unusual (e.g. for this size it should be more expensive...)
 
 
 ## Ideas for exploration
 - Can we extract location from photos? Usually they only tell you street and it's not super specific
+- Is the date of taking the ad down important?
 
-## Serwisy ogłoszeniowe
+## Ads
 
 Free:
  - www.gumtree.pl

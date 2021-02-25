@@ -16,13 +16,17 @@ def print_count():
     for col in ['date_scraped', 'location', 'num_rooms']:
         print(col.upper())
 
-        c.execute(f"SELECT {col}, count({col}) as how_many FROM flats GROUP BY {col}")
+        c.execute(f"SELECT {col}, count({col}) as how_many "
+                  f"FROM flats "
+                  f"GROUP BY {col}")
         for elem in c.fetchall():
             print(f"{elem}")
 
         print("-"*80)
 
-    c.execute(f"SELECT location, num_rooms, count(num_rooms) as how_many FROM flats GROUP BY location, num_rooms")
+    c.execute(f"SELECT location, num_rooms, count(num_rooms) as how_many "
+              f"FROM flats "
+              f"GROUP BY location, num_rooms")
     print("LOCATION + NUM_ROOMS")
     for elem in c.fetchall():
         print(f"{elem}")

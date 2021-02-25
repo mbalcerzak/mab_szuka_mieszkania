@@ -1,12 +1,5 @@
-"""
-- change datestring
-- no columns: price, price_history in flats
-- a whole new table: prices
-"""
 import sqlite3
 
-# price, price_history, date_scraped, ad_id
-# TODO change date format for flats table
 
 def change_date_str(text: str) -> str:
     if "/" in text:
@@ -19,13 +12,9 @@ def change_date_str(text: str) -> str:
 def load_new_db():
     try:
         conn = sqlite3.connect('../data/flats.db')
-        # conn = sqlite3.connect(r'C:\Users\kkql180\NonWorkProjects\mab_szuka_mieszkania\data\flats_test.db')
         cursor = conn.cursor()
     except sqlite3.Error as e:
         raise Exception
-
-    # cursor.execute("DELETE FROM prices")
-    # conn.commit()
 
     cursor.execute("SELECT ad_id, price, price_history, date_scraped FROM flats")
     list_flats = cursor.fetchall()
@@ -64,7 +53,6 @@ def load_new_db():
 def change_dates_flats_table():
     try:
         conn = sqlite3.connect('../data/flats.db')
-        # conn = sqlite3.connect(r'C:\Users\kkql180\NonWorkProjects\mab_szuka_mieszkania\data\flats_test.db')
         cursor = conn.cursor()
     except sqlite3.Error as e:
         raise Exception
@@ -91,5 +79,4 @@ def change_dates_flats_table():
 
 
 if __name__ == '__main__':
-    # load_new_db()
     change_dates_flats_table()
