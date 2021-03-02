@@ -32,25 +32,18 @@ def main():
         raise Exception
 
     # TODO too slow
-    # cursor.execute(f'SELECT ad_id, page_address FROM flats')
-    # flat_list = cursor.fetchall()
-    #
-    # for flat in flat_list:
-    #     ad_id, page_address = flat[0], flat[1]
-    #     print(page_address)
+    cursor.execute(f'SELECT ad_id, page_address FROM flats')
+    flat_list = cursor.fetchall()
 
-    page_address = 'https://www.gumtree.pl/a-mieszkania-i-domy-sprzedam-i-kupie/praga-polnoc/okrzei-2-pokoje-nowa-praga-winda-garaz-metro/1008494174100911381140509'
-    ad_price = get_flat_ad_price(page_address)
-    print(ad_price)
+    for flat in flat_list:
+        ad_id, page_address = flat[0], flat[1]
 
-
-    print(check_ad_valid(page_address).text)
-
-
-
-        # if check_if_row_exists(cursor, ad_id):
-        #     if check_if_price_changed(cursor, ad_id, ad_price):
-        #         update_price(cursor, ad_id, ad_price, conn)
+        ad_price = get_flat_ad_price(page_address)
+        if ad_price != 0:
+            if check_if_row_exists(cursor, ad_id):
+                if check_if_price_changed(cursor, ad_id, ad_price):
+                    update_price(cursor, ad_id, ad_price, conn)
+                    conn.commit()
 
 
 if __name__ == "__main__":

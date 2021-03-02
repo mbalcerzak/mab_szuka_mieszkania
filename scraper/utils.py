@@ -17,7 +17,10 @@ def info_scraped_today(cursor):
     all_ads = cursor.fetchone()[0]
 
     cursor.execute(f"SELECT count(flat_id) FROM prices "
-                   f"WHERE flat_id in (SELECT flat_id FROM prices GROUP BY flat_id HAVING count(flat_id) > 2) "
+                   f"WHERE flat_id in (SELECT flat_id "
+                                       f"FROM prices "
+                                       f"GROUP BY flat_id "
+                                       f"HAVING count(flat_id) > 2) "
                    f"and date = '{today}' ")
     price_changes = cursor.fetchone()[0]
 
