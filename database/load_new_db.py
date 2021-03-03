@@ -50,6 +50,7 @@ def load_new_db():
 
     conn.close()
 
+
 def change_dates_flats_table():
     try:
         conn = sqlite3.connect('../data/flats.db')
@@ -79,4 +80,5 @@ def change_dates_flats_table():
 
 
 if __name__ == '__main__':
-    change_dates_flats_table()
+    # change_dates_flats_table()
+    pass

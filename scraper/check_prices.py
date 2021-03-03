@@ -32,7 +32,9 @@ def main():
         raise Exception
 
     # TODO too slow
-    cursor.execute(f'SELECT ad_id, page_address FROM flats')
+    cursor.execute(f'SELECT ad_id, page_address '
+                   f'FROM flats '
+                   f'ORDER BY ad_id')
     flat_list = cursor.fetchall()
 
     for flat in flat_list:
@@ -44,6 +46,8 @@ def main():
                 if check_if_price_changed(cursor, ad_id, ad_price):
                     update_price(cursor, ad_id, ad_price, conn)
                     conn.commit()
+        else:
+            print(f"\n{ad_id} - PRICE O\n")
 
 
 if __name__ == "__main__":
