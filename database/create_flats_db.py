@@ -58,7 +58,7 @@ def create_database():
     if conn is not None:
         # create_table(conn, flats_table)
         # create_table(conn, prices_table)
-        create_table(conn, taken_down)
+        # create_table(conn, taken_down)
         print("Created!")
     else:
         print("Error! Cannot create the database connection")
