@@ -1,4 +1,6 @@
 import pandas as pd
+import spacy
+import pl_core_news_lg
 
 
 def load_dataframe(file):
@@ -9,7 +11,7 @@ def load_dataframe(file):
 def main(flats, prices):
     print(flats['flat_area'].value_counts())
 
-    # TODO Why ID in flats is not unique
+    nlp = pl_core_news_lg.load()
 
 
 
