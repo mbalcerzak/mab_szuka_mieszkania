@@ -1,6 +1,5 @@
 from pydrive.drive import GoogleDrive
 from pydrive.auth import GoogleAuth
-import os
 from datetime import datetime
 
 
@@ -18,15 +17,14 @@ def main():
 
 	drive = GoogleDrive(gauth)
 
-	path = r"/home/mab/PycharmProjects/mab_szuka_mieszkania"
-
 	today = datetime.today().strftime('%d%B%Y')
 
-	for x in os.listdir(path + "/data"):
-		f = drive.CreateFile({'title': f"{today}_{x}"})
-		f.SetContentFile(os.path.join(path + "/data", x))
-		f.Upload()
-		f = None
+	f = drive.CreateFile({'title': f"flats_{today}"})
+	f.SetContentFile("../data/flats.db")
+	f.Upload()
+	f = None
+
+	print("Uploaded")
 
 
 if __name__ == '__main__':
