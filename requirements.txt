@@ -56,6 +56,7 @@ pexpect==4.8.0
 Pillow==8.0.1
 pipenv==2020.11.15
 pkginfo==1.6.1
+pl-core-news-lg @ https://github.com/explosion/spacy-models/releases/download/pl_core_news_lg-3.0.0/pl_core_news_lg-3.0.0-py3-none-any.whl
 poetry==1.1.4
 poetry-core==1.0.0
 preshed==3.0.5

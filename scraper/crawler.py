@@ -59,5 +59,5 @@ class BlogSpider(scrapy.Spider):
                 yield response.follow(next_page, self.parse)
 
         except KeyError:
-            info_scraped_today(cursor)
+            print(info_scraped_today(cursor))
             print("I think we reached our 50 pages. KeyError occurred.")
