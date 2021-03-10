@@ -25,11 +25,9 @@ def info_scraped_today(cursor):
     price_changes = cursor.fetchone()[0]
 
     print("_"*100)
-    print(f"Today we managed to scrape: \n"
-          f"\tNew ads today: {ads_today:,}\n"
-          f"\tOverall: {all_ads:,}\n"
-          f"\tPrice changes today: {price_changes}\n"
-          f"Script finished running at: {datetime.now().strftime('%H:%M')}")
+    return(f"\n\tNew ads today: {ads_today:,}\n"
+           f"\tOverall: {all_ads:,}\n"
+           f"\tPrice changes today: {price_changes}\n")
 
 
 def get_ad_price(flat):

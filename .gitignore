@@ -9,3 +9,4 @@ __pycache__/
 *.jl
 playground.py
 database/mycreds.txt
+passwords.py
