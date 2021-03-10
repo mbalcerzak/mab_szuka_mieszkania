@@ -45,7 +45,6 @@ def main():
             if check_if_row_exists(cursor, ad_id):
                 if check_if_price_changed(cursor, ad_id, ad_price):
                     update_price(cursor, ad_id, ad_price, conn)
-                    conn.commit()
         else:
             print(f"\n{ad_id} - PRICE O\n")
 

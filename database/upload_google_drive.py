@@ -2,7 +2,6 @@ from pydrive.drive import GoogleDrive
 from pydrive.auth import GoogleAuth
 import os
 from datetime import datetime
-from shutil import copyfile
 
 
 def main():
@@ -28,10 +27,6 @@ def main():
 		f.SetContentFile(os.path.join(path + "/data", x))
 		f.Upload()
 		f = None
-
-	print("Uploaded " + str(len(os.listdir(path + "/data"))) + " files")
-
-	copyfile(path + "/data/flats.db", path + f"/archive/flats_{today}.db")
 
 
 if __name__ == '__main__':

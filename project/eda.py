@@ -1,5 +1,7 @@
 import sqlite3
 
+from scraper.utils import today_str
+
 
 def connection():
     try:
@@ -36,6 +38,12 @@ def print_count():
     c.execute(f"SELECT count(*) FROM flats")
     all_ads = c.fetchone()[0]
     print(f"Scraped overall: {all_ads} ads")
+
+    c.execute(f"SELECT count(*) "
+              f"FROM flats "
+              f"WHERE date_scraped = '{today_str()}'")
+    all_ads = c.fetchone()[0]
+    print(f"Scraped today: {all_ads} ads")
 
 
 if __name__ == "__main__":
