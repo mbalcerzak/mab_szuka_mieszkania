@@ -1,5 +1,5 @@
-source /home/mab/PycharmProjects/mab_szuka_mieszkania/.venv/bin/activate
+source /home/pi/Documents/mab_szuka_mieszkania/.venv/bin/activate
 
-cd /home/mab/PycharmProjects/mab_szuka_mieszkania
+cd /home/pi/Documents/mab_szuka_mieszkania
 
-python daily_report.py
+python3 daily_report.py

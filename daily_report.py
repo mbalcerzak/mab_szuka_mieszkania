@@ -24,9 +24,9 @@ def main():
     except sqlite3.Error as e:
         raise Exception
 
-    msg = (f"""Subject: Scraper Report {today} \
-            \n\n \
-           {info_scraped_today(cursor)}""")
+    msg = (f"Subject: Scraper Report {today} \n\n {info_scraped_today(cursor)}")
+
+    print(info_scraped_today(cursor))
 
     context = ssl.create_default_context()
     port = 587
