@@ -40,7 +40,7 @@ class BlogSpider(scrapy.Spider):
 
             page_address = get_page_address(flat_ad)
             ad_price = get_ad_price(flat_ad)
-            ad_id = page_address.split('/')[-1][3:12]
+            ad_id = page_address.split('/')[-1]
 
             if check_if_row_exists(cursor, ad_id):
                 if check_if_price_changed(cursor, ad_id, ad_price):
