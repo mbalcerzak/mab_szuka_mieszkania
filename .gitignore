@@ -10,3 +10,5 @@ __pycache__/
 playground.py
 database/mycreds.txt
 passwords.py
+.DS_Store
+crawler.sh

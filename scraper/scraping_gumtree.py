@@ -95,7 +95,7 @@ def get_flat_info(page_address) -> dict:
     page = requests.get(page_address)
     soup = BeautifulSoup(page.content, 'html.parser')
 
-    ad_id = page_address.split('/')[-1]
+    ad_id = str(page_address.split('/')[-1])
     price = get_price(soup)
     title = get_add_title(soup)
     today = today_str()

@@ -1,10 +1,11 @@
 import logging
 import scrapy
 import sqlite3
+from datetime import date
 
 from scraping_gumtree import add_flat
-from update_flat_info import check_if_row_exists, check_if_price_changed, update_price
-from utils import get_ad_price, get_page_address,info_scraped_today, get_next_page, get_page_info
+from update_flat_info import update_price
+from utils import get_ad_price, get_page_address, info_scraped_today, get_next_page, get_page_info, create_json_pricecheck
 
 logging.getLogger('scrapy').setLevel(logging.WARNING)
 
@@ -35,6 +36,8 @@ class BlogSpider(scrapy.Spider):
         except sqlite3.Error as e:
             raise Exception
 
+        latest_prices = create_json_pricecheck(cursor)
+
         for flat_ad in response.css('div.tileV1'):
             print("\n" + "-"*100 + " " + str(i))
 
@@ -42,9 +45,12 @@ class BlogSpider(scrapy.Spider):
             ad_price = get_ad_price(flat_ad)
             ad_id = page_address.split('/')[-1]
 
-            if check_if_row_exists(cursor, ad_id):
-                if check_if_price_changed(cursor, ad_id, ad_price):
+            if ad_id in latest_prices:
+                if latest_prices[ad_id] != ad_price:
+                    print(f"{latest_prices[ad_id]} --> {ad_price}")
                     update_price(cursor, ad_id, ad_price, conn)
+                else:
+                    print(f"{ad_id} exists in the database. Price is still the same")
             else:
                 add_flat(page_address, cursor, conn)
 
