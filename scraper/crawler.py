@@ -1,13 +1,14 @@
 import logging
 import scrapy
 import sqlite3
-from datetime import date
 
 from scraping_gumtree import add_flat
 from update_flat_info import update_price
-from utils import get_ad_price, get_page_address, info_scraped_today, get_next_page, get_page_info, create_json_pricecheck
+from utils import get_ad_price, get_page_address, info_scraped_today, get_next_page, get_page_info, get_ad_id, get_flat_id_from_ad
+from latest_prices import get_latest_prices_json
 
 logging.getLogger('scrapy').setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 
 class BlogSpider(scrapy.Spider):
@@ -36,17 +37,17 @@ class BlogSpider(scrapy.Spider):
         except sqlite3.Error as e:
             raise Exception
 
-        latest_prices = create_json_pricecheck(cursor)
+        latest_prices = get_latest_prices_json()
 
         for flat_ad in response.css('div.tileV1'):
             print("\n" + "-"*100 + " " + str(i))
 
             page_address = get_page_address(flat_ad)
             ad_price = get_ad_price(flat_ad)
-            ad_id = page_address.split('/')[-1]
+            ad_id = get_ad_id(page_address)
 
             if ad_id in latest_prices:
-                if latest_prices[ad_id] != ad_price:
+                if int(latest_prices[ad_id]) != int(ad_price):
                     print(f"{latest_prices[ad_id]} --> {ad_price}")
                     update_price(cursor, ad_id, ad_price, conn)
                 else:

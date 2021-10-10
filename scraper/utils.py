@@ -1,9 +1,14 @@
 import re
 from datetime import datetime
+import json
 
 
 def today_str():
     return datetime.today().strftime('%Y-%m-%d')
+
+
+def get_ad_id(page_address):
+    return f"{page_address.split('/')[-1]}"
 
 
 def info_scraped_today(cursor):
@@ -54,3 +59,10 @@ def get_page_info(next_page: str) -> None:
 def get_next_page(response):
     next_page = response.css('a.arrows.icon-right-arrow.icon-angle-right-gray').attrib['href']
     return next_page
+
+
+def get_flat_id_from_ad(cursor, ad_id):
+    print(f"AD: {ad_id}")
+    cursor.execute(f"SELECT flat_id FROM flats WHERE ad_id = '{ad_id}'")
+    flat_id = cursor.fetchone()[0]
+    return flat_id
