@@ -1,6 +1,7 @@
 import logging
 import scrapy
 import sqlite3
+from datetime import date
 
 from scraping_gumtree import add_flat
 from update_flat_info import update_price
@@ -38,6 +39,12 @@ class BlogSpider(scrapy.Spider):
             raise Exception
 
         latest_prices = get_latest_prices_json()
+        today = date.today().strftime("%Y-%m-%d")
+
+        print(latest_prices['date'], today)
+
+        if latest_prices['date'] != today:
+            raise Exception
 
         for flat_ad in response.css('div.tileV1'):
             print("\n" + "-"*100 + " " + str(i))
