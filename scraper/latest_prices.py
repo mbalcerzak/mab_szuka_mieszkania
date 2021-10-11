@@ -1,5 +1,6 @@
 import json
 import sqlite3
+from datetime import date
 
 
 def query_latest_price(cursor):
@@ -24,6 +25,9 @@ def query_latest_price(cursor):
         price = row[2]
 
         json_prices[flat_id] = price
+
+    today = date.today().strftime("%Y-%m-%d")
+    json_prices['date'] = today
 
     return json_prices
 
