@@ -12,6 +12,8 @@ def get_price(soup) -> int:
         results = soup.find('div', class_="vip-title clearfix")
         price = results.find('span', class_='amount')
 
+        print(f"PRICE: {price}")
+
         return int(re.sub("[^\d\.,]", "", price.text))
     except (AttributeError, ValueError):
         return 0
