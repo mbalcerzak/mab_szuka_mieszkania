@@ -13,7 +13,7 @@ def get_price(soup) -> int:
         price = results.find('span', class_='amount')
 
         return int(re.sub("[^\d\.,]", "", price.text))
-    except AttributeError or ValueError:
+    except (AttributeError, ValueError):
         return 0
 
 

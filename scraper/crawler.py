@@ -63,7 +63,8 @@ class BlogSpider(scrapy.Spider):
 
             i += 1
 
-        print(report)
+        for tp, n in report.items():
+            print(f"{tp}: {n}")
 
         try:
             next_page = get_next_page(response)
