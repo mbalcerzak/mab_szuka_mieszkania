@@ -5,7 +5,7 @@ from datetime import date
 
 from scraping_gumtree import add_flat
 from update_flat_info import update_price
-from utils import get_ad_price, get_page_address, info_scraped_today, get_next_page, get_page_info, get_ad_id, get_flat_id_from_ad
+from utils import get_ad_price, get_page_address, info_scraped_today, get_next_page, get_page_info, get_ad_id
 from latest_prices import get_latest_prices_json
 
 logging.getLogger('scrapy').setLevel(logging.WARNING)
@@ -16,21 +16,23 @@ class BlogSpider(scrapy.Spider):
     name = "gumtree"
     start_urls = [
         'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/warszawa/mieszkanie/v1c9073l3200008a1dwp1?df=ownr&priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/praga-poludnie/mieszkanie/v1c9073l3200015a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/praga-polnoc/mieszkanie/v1c9073l3200014a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/wola/mieszkanie/v1c9073l3200025a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/ochota/mieszkanie/v1c9073l3200013a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/srodmiescie/mieszkanie/v1c9073l3200017a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/mokotow/mieszkanie/v1c9073l3200012a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/bemowo/mieszkanie/v1c9073l3200009a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/targowek/mieszkanie/v1c9073l3200018a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/zoliborz/mieszkanie/v1c9073l3200026a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/wilanow/mieszkanie/v1c9073l3200023a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/ursynow/mieszkanie/v1c9073l3200020a1dwp1?priceType=FIXED'
+        # 'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/praga-poludnie/mieszkanie/v1c9073l3200015a1dwp1?priceType=FIXED',
+        # 'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/praga-polnoc/mieszkanie/v1c9073l3200014a1dwp1?priceType=FIXED',
+        # 'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/wola/mieszkanie/v1c9073l3200025a1dwp1?priceType=FIXED',
+        # 'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/ochota/mieszkanie/v1c9073l3200013a1dwp1?priceType=FIXED',
+        # 'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/srodmiescie/mieszkanie/v1c9073l3200017a1dwp1?priceType=FIXED',
+        # 'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/mokotow/mieszkanie/v1c9073l3200012a1dwp1?priceType=FIXED',
+        # 'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/bemowo/mieszkanie/v1c9073l3200009a1dwp1?priceType=FIXED',
+        # 'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/targowek/mieszkanie/v1c9073l3200018a1dwp1?priceType=FIXED',
+        # 'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/zoliborz/mieszkanie/v1c9073l3200026a1dwp1?priceType=FIXED',
+        # 'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/wilanow/mieszkanie/v1c9073l3200023a1dwp1?priceType=FIXED',
+        # 'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/ursynow/mieszkanie/v1c9073l3200020a1dwp1?priceType=FIXED'
     ]
 
     def parse(self, response):
         i = 1
+
+        report = {'new': 0, 'existing': 0, 'change': 0}
 
         try:
             conn = sqlite3.connect('../data/flats.db')
@@ -40,29 +42,28 @@ class BlogSpider(scrapy.Spider):
 
         latest_prices = get_latest_prices_json()
         today = date.today().strftime("%Y-%m-%d")
-
-        print(latest_prices['date'], today)
-
-        if latest_prices['date'] != today:
-            raise Exception
+        
+        # if latest_prices['date'] != today:
+        #     raise Exception("Update 'latest price JSON' ")
 
         for flat_ad in response.css('div.tileV1'):
-            print("\n" + "-"*100 + " " + str(i))
-
             page_address = get_page_address(flat_ad)
             ad_price = get_ad_price(flat_ad)
             ad_id = get_ad_id(page_address)
 
             if ad_id in latest_prices:
                 if int(latest_prices[ad_id]) != int(ad_price):
-                    print(f"{latest_prices[ad_id]} --> {ad_price}")
                     update_price(cursor, ad_id, ad_price, conn)
+                    report['change'] += 1
                 else:
-                    print(f"{ad_id} exists in the database. Price is still the same")
+                    report['existing'] += 1
             else:
                 add_flat(page_address, cursor, conn)
+                report['new'] += 1
 
             i += 1
+
+        print(report)
 
         try:
             next_page = get_next_page(response)

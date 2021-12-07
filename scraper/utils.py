@@ -53,7 +53,7 @@ def get_page_info(next_page: str) -> None:
     page_num = page.split('-')[-1]
     district = next_page.split('/')[2].upper()
 
-    print(f"\n\n{' '*15}({district} | NEXT PAGE: {page_num}){' '*15}\n")
+    print(f"\n\n{' '*15}({district} | page: {page_num}){' '*15}\n")
 
 
 def get_next_page(response):
@@ -62,7 +62,6 @@ def get_next_page(response):
 
 
 def get_flat_id_from_ad(cursor, ad_id):
-    print(f"AD: {ad_id}")
     cursor.execute(f"SELECT flat_id FROM flats WHERE ad_id = '{ad_id}'")
     flat_id = cursor.fetchone()[0]
     return flat_id
