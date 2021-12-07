@@ -43,8 +43,8 @@ class BlogSpider(scrapy.Spider):
         latest_prices = get_latest_prices_json()
         today = date.today().strftime("%Y-%m-%d")
         
-        # if latest_prices['date'] != today:
-        #     raise Exception("Update 'latest price JSON' ")
+        if latest_prices['date'] != today:
+            raise Exception("Update 'latest price JSON' ")
 
         for flat_ad in response.css('div.tileV1'):
             page_address = get_page_address(flat_ad)
