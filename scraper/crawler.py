@@ -52,11 +52,14 @@ class BlogSpider(scrapy.Spider):
             ad_id = get_ad_id(page_address)
 
             if ad_id in latest_prices:
-                if int(latest_prices[ad_id]) != int(ad_price):
-                    update_price(cursor, ad_id, ad_price, conn)
-                    report['change'] += 1
-                else:
-                    report['existing'] += 1
+                try:
+                    if int(latest_prices[ad_id]) != int(ad_price):
+                        update_price(cursor, ad_id, ad_price, conn)
+                        report['change'] += 1
+                    else:
+                        report['existing'] += 1
+                except ValueError:
+                    print(f"Wrongly put price: {ad_price}")
             else:
                 add_flat(page_address, cursor, conn)
                 report['new'] += 1
