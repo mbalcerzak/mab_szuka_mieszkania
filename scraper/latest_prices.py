@@ -52,6 +52,8 @@ def create_price_json():
     with open('../data/latest_prices.json', 'w') as f:
         json.dump(latest_prices, f)
 
+    conn.close()
+
 
 if __name__ == "__main__":
     create_price_json()
