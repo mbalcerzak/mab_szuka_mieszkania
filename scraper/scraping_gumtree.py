@@ -4,7 +4,7 @@ import re
 import sqlite3
 from bs4 import BeautifulSoup
 
-from utils import today_str
+from utils import today_str, get_ad_id
 
 
 def get_price(soup) -> int:
@@ -12,8 +12,10 @@ def get_price(soup) -> int:
         results = soup.find('div', class_="vip-title clearfix")
         price = results.find('span', class_='amount')
 
+        print(f"PRICE: {price}")
+
         return int(re.sub("[^\d\.,]", "", price.text))
-    except AttributeError or ValueError:
+    except (AttributeError, ValueError):
         return 0
 
 
@@ -50,7 +52,9 @@ def get_add_title(soup) -> str:
 def extract_num_rooms(text: str) -> int:
     if "Kawalerka" in text:
         return 1
-    return int(re.sub("[^\d]", "", text))
+    num_rooms = int(re.sub("[^\d]", "", text))
+
+    return num_rooms if num_rooms > 0 else 1
 
 
 def change_date_str(text: str) -> str:
@@ -95,14 +99,15 @@ def get_flat_info(page_address) -> dict:
     page = requests.get(page_address)
     soup = BeautifulSoup(page.content, 'html.parser')
 
-    ad_id = page_address.split('/')[-1]
+    ad_id = get_ad_id(page_address)
     price = get_price(soup)
     title = get_add_title(soup)
     today = today_str()
     description = get_description(soup)
     photos_links = get_photos(soup)
 
-    flat = {'ad_id': ad_id,
+    flat = {
+            'ad_id': ad_id,
             'title': title,
             'date_posted': 'NA',
             'date_scraped': today,
@@ -116,7 +121,6 @@ def get_flat_info(page_address) -> dict:
             'parking': 'Brak',
             'description': description,
             'photos_links': photos_links,
-            'price_history': '{}',
             'page_address': page_address
             }
 
@@ -131,11 +135,11 @@ def get_flat_info(page_address) -> dict:
 
 
 def add_flat(page_address, cursor, conn):
-    print("Adding a new flat")
     flat = get_flat_info(page_address)
 
     input_flat = (f"INSERT INTO flats VALUES ("
-                  f"{flat['ad_id']}, "
+                  "NULL, "   # flat_id (increment value, unique ID)
+                  f"\'{flat['ad_id']}\', "
                   f"\'{flat['title']}\', "
                   f"\'{flat['date_posted']}\', "
                   f"\'{flat['date_scraped']}\', "
@@ -148,33 +152,20 @@ def add_flat(page_address, cursor, conn):
                   f"\"{flat['parking']}\", "
                   f"\"{flat['description']}\", "
                   f"\"{flat['photos_links']}\", "
-                  f"\"{flat['page_address']}\""
+                  f"\"{flat['page_address']}\" "
                   ")")
+
     cursor.execute(input_flat)
     conn.commit()
+    
+    flat_id = cursor.lastrowid 
 
     input_price = (f"INSERT INTO prices VALUES("
                    "NULL, "
-                   f"{flat['ad_id']}, "
+                   f"{flat_id}, "
                    f"{flat['price']}, "
                    f"\'{flat['date_scraped']}\' "
                    ")")
 
     cursor.execute(input_price)
     conn.commit()
-
-
-if __name__ == "__main__":
-    try:
-        conn = sqlite3.connect('../data/flats.db')
-        cursor = conn.cursor()
-    except sqlite3.Error as e:
-        raise Exception
-
-    ad_link = 'X'
-    flat_example = get_flat_info(ad_link)
-    print(flat_example)
-
-    add_flat(ad_link, cursor)
-    conn.commit()
-    conn.close()
