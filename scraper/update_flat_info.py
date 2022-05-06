@@ -1,7 +1,7 @@
 from utils import today_str
 
 
-def update_price(cursor, ad_id, ad_price, conn):
+def update_price(cursor, ad_id: str, ad_price: int, conn) -> None:
     today = today_str()
 
     cursor.execute(f"SELECT flat_id FROM flats WHERE ad_id = '{ad_id}'")

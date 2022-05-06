@@ -95,7 +95,7 @@ keys_dict = {
     'Parking': 'parking'}
 
 
-def get_flat_info(page_address) -> dict:
+def get_flat_info(page_address: str) -> dict:
     page = requests.get(page_address)
     soup = BeautifulSoup(page.content, 'html.parser')
 
@@ -134,7 +134,7 @@ def get_flat_info(page_address) -> dict:
     return flat
 
 
-def add_flat(page_address, cursor, conn):
+def add_flat(page_address:str, cursor, conn) -> None:
     flat = get_flat_info(page_address)
 
     input_flat = (f"INSERT INTO flats VALUES ("

@@ -3,18 +3,14 @@ import sqlite3
 from datetime import date
 
 
-def query_latest_price(cursor):
+def query_latest_price(cursor) -> dict:
     json_prices = {}
 
-    query = """SELECT
-                    max(price_id) AS max_id,
-                    ad_id,
-                    price
-                FROM
-                    prices
-                    LEFT JOIN flats ON flats.flat_id = prices.flat_id
-                GROUP BY
-                    ad_id
+    query = """
+            SELECT max(price_id) AS max_id, ad_id, price
+            FROM prices
+            LEFT JOIN flats ON flats.flat_id = prices.flat_id
+            GROUP BY ad_id
             """
 
     cursor.execute(query)
@@ -32,15 +28,14 @@ def query_latest_price(cursor):
     return json_prices
 
 
-
-def get_latest_prices_json():
+def get_latest_prices_json() -> dict:
     with open('../data/latest_prices.json', 'r') as f:
         latest_prices = json.load(f)
 
     return latest_prices
 
 
-def create_price_json():
+def create_price_json() -> None:
     try:
         conn = sqlite3.connect('../data/flats.db')
         cursor = conn.cursor()

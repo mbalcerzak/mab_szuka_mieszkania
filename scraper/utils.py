@@ -3,15 +3,15 @@ from datetime import datetime
 import json
 
 
-def today_str():
+def today_str() -> str:
     return datetime.today().strftime('%Y-%m-%d')
 
 
-def get_ad_id(page_address):
+def get_ad_id(page_address) -> str:
     return f"{page_address.split('/')[-1]}"
 
 
-def info_scraped_today(cursor):
+def info_scraped_today(cursor) -> str:
     """Print how many ads were scraped today
     and how many there are in the whole database"""
     today = today_str()
@@ -35,13 +35,13 @@ def info_scraped_today(cursor):
            f"\tPrice changes today: {price_changes}\n")
 
 
-def get_ad_price(flat):
+def get_ad_price(flat) -> int:
     price = flat.css('span.ad-price::text').get()
     price = re.sub("[^\d\.,]", "", price)
     return price
 
 
-def get_page_address(flat):
+def get_page_address(flat) -> str:
     address = flat.css('a::attr("href")').get()
     address = f'https://www.gumtree.pl{address}'
     return address
