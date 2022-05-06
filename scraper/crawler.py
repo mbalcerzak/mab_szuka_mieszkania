@@ -1,6 +1,7 @@
 import logging
 import scrapy
 import sqlite3
+import json
 from datetime import date
 
 from scraping_gumtree import add_flat
@@ -14,20 +15,9 @@ logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 class BlogSpider(scrapy.Spider):
     name = "gumtree"
-    start_urls = [
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/warszawa/mieszkanie/v1c9073l3200008a1dwp1?df=ownr&priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/praga-poludnie/mieszkanie/v1c9073l3200015a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/praga-polnoc/mieszkanie/v1c9073l3200014a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/wola/mieszkanie/v1c9073l3200025a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/ochota/mieszkanie/v1c9073l3200013a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/srodmiescie/mieszkanie/v1c9073l3200017a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/mokotow/mieszkanie/v1c9073l3200012a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/bemowo/mieszkanie/v1c9073l3200009a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/targowek/mieszkanie/v1c9073l3200018a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/zoliborz/mieszkanie/v1c9073l3200026a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/wilanow/mieszkanie/v1c9073l3200023a1dwp1?priceType=FIXED',
-        'https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/ursynow/mieszkanie/v1c9073l3200020a1dwp1?priceType=FIXED'
-    ]
+
+    with open('../start_urls.json', 'r') as f:
+        start_urls = json.load(f)
 
     def parse(self, response):
         i = 1
@@ -79,4 +69,4 @@ class BlogSpider(scrapy.Spider):
 
         except KeyError:
             print(info_scraped_today(cursor))
-            print("I think we reached our 50 pages. KeyError occurred.")
+            print("We reached our 50 pages")
