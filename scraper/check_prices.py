@@ -20,7 +20,7 @@ def check_ad_valid(page_address):
     return soup.find('div', class_="message")
 
 
-def main():
+def main() -> None:
     """
     A script to run through all the ads and see if any of the prices changed
     Also checks if the ad is still hanging
@@ -31,7 +31,6 @@ def main():
     except sqlite3.Error as e:
         raise Exception
 
-    # TODO too slow
     cursor.execute(f'SELECT ad_id, page_address '
                    f'FROM flats '
                    f'ORDER BY ad_id')
